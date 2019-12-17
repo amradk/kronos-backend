@@ -3,3 +3,9 @@ js
 kronos
 __pycache__
 kronos_db.sql
+bin/
+lib/
+lib64
+logs/
+pyvenv.cfg
+

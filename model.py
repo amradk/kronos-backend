@@ -1,8 +1,8 @@
 from peewee import *
 
 #sqlite_db = SqliteDatabase('./kronos.db', pragmas={'journal_mode': 'wal'})
-db = MySQLDatabase('kronos_db', user='root', password='PassWord',
-                         host='127.0.0.1', port=3360)
+db = MySQLDatabase('kronos_db', user='kronos', password='Kr0nos@Time',
+                         host='127.0.0.1', port=3306)
 
 class BaseModel(Model):
     class Meta:
