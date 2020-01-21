@@ -9,17 +9,20 @@ class LocalityResource(Resource):
     def get(self, name):
         if name == '':
             return "Locality not found", 404
-        query = Locality.select(Locality.id, Locality.type, Locality.name, Locality.fedsubj_code, Locality.district).where(Locality.name == name)
+        query = Locality.select(Locality.id, Locality.type, Locality.guid, Locality.name, Locality.fedsubj_code, Locality.district).where(Locality.name == name)
         if len(query) > 0:
             localitys = []
             for l in query:
                 localitys.append({
-                    'name':l.name,
-                    'type':l.type.type,
-                    'fedsubj':l.fedsubj_code.code,
-                    'district':l.district.name,
-                    'msk_tz':l.district.msk_tz,
-                    'utc_tz':l.district.utc_tz,
+                    'Name':l.name,
+                    'Type':l.type.type,
+                    'GUID':l.guid,
+                    'FedSubjCode':l.fedsubj_code.code,
+                    'FedSubjType':l.fedsubj_code.type.type,
+                    'FedSubjName':l.fedsubj_code.name,
+                    'District':l.district.name,
+                    'MSK_TZ':l.district.msk_tz,
+                    'UTC_TZ':l.district.utc_tz,
                 })
         else:
             return "Locality not found", 404
