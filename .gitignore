@@ -2,3 +2,4 @@ node_modules
 js
 kronos
 __pycache__
+kronos_db.sql
