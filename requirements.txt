@@ -5,3 +5,4 @@ Jinja2==2.10.3
 peewee==3.13.1
 PyMySQL==0.9.3
 Werkzeug==0.16.0
+unrar==0.4

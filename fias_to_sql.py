@@ -8,7 +8,7 @@ from model import *
 from ru_tz import *
 
 #путь к файлам базы fias dbf, нужны ADDROBJ
-fias_dir = './fias_dbf'
+fias_dir = './'
 
 def usage():
     print("usage:", os.path.basename(__file__), " -d -c -e")
@@ -369,12 +369,12 @@ def add_tz(tz_map, msk_tz_map):
 
 create_tables(db)
 
-#with os.scandir(fias_dir) as entries:
-#    for entry in entries:
-#        if entry.name.startswith('ADDROB'):
-#            print('Process file: ' + fias_dir + '/' + entry.name)
+with os.scandir(fias_dir) as entries:
+    for entry in entries:
+        if entry.name.startswith('ADDROB'):
+            print('Process file: ' + fias_dir + '/' + entry.name)
             #process_dbf(fias_dir + '/' + entry.name)
-#            process_dbf_in_mem(fias_dir + '/' + entry.name)
+            process_dbf_in_mem(fias_dir + '/' + entry.name)
 
 add_tz(fedsubj_tz_map, msk_to_utc_tz_map)
 
