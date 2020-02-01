@@ -55,6 +55,11 @@ def process_dbf_in_mem(dbf_file_path):
     fs_districts = []
     lt = []
     locality = []
+    # в некоторых случаях не удается определить принадлежность нас. пункта к району или городу
+    # т.е. родительского объекта с совподающим AREACODE нет, создадим его принудительно
+    exceptions_cities = {77:'Москва', 58:'Пенза', 91:'Крым', 99:'Байконур', 79:'Санкт-Петербург', 92:'Севастополь'}
+    exceptions_districts = {72:'Тюмень', 99:'Тюмень'}
+    exceptions_fed_s = [50, 47]
 
     for record in table:
         # субъект федерации
@@ -89,149 +94,26 @@ def process_dbf_in_mem(dbf_file_path):
                 }
             )
 
-        #город или населенный пункт
-        # костыль для Москвы
-        if (
-            (int(record['REGIONCODE']) == 77) and (record['OFFNAME'] == 'Москва') and 
-            (record['LIVESTATUS'] == 1)
-        ):
-            fs_districts.append(
-                {
-                    'guid':fed_s['guid'],
-                    'name':fed_s['name'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'tz':'',
-                    'areacode':'000'
-                }
-            )
-            locality.append(
-                {
-                    'guid':record['AOGUID'],
-                    'type':record['SHORTNAME'],
-                    'name':record['OFFNAME'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'district':record['AREACODE']
-                }
-            )
-
-        # костыль для Пензы
-        if (
-            (int(record['REGIONCODE']) == 58) and (record['OFFNAME'] == 'Пенза') and 
-            (record['LIVESTATUS'] == 1)
-        ):
-            fs_districts.append(
-                {
-                    'guid':fed_s['guid'],
-                    'name':fed_s['name'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'tz':'',
-                    'areacode':'000'
-                }
-            )
-            locality.append(
-                {
-                    'guid':record['AOGUID'],
-                    'type':record['SHORTNAME'],
-                    'name':record['OFFNAME'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'district':record['AREACODE']
-                }
-            )
-
-        # костыль для Крыма
-        if (
-            (int(record['REGIONCODE']) == 91) and (record['OFFNAME'] == 'Крым') and 
-            (record['LIVESTATUS'] == 1)
-        ):
-            fs_districts.append(
-                {
-                    'guid':fed_s['guid'],
-                    'name':fed_s['name'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'tz':'',
-                    'areacode':'000'
-                }
-            )
-            locality.append(
-                {
-                    'guid':record['AOGUID'],
-                    'type':'г',
-                    'name':record['OFFNAME'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'district':record['AREACODE']
-                }
-            )
-
-        # костыль для Байконура
-        if (
-            (int(record['REGIONCODE']) == 99) and (record['OFFNAME'] == 'Байконур') and 
-            (record['LIVESTATUS'] == 1)
-        ):
-            fs_districts.append(
-                {
-                    'guid':fed_s['guid'],
-                    'name':fed_s['name'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'tz':'',
-                    'areacode':'000'
-                }
-            )
-            locality.append(
-                {
-                    'guid':record['AOGUID'],
-                    'type':record['SHORTNAME'],
-                    'name':record['OFFNAME'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'district':record['AREACODE']
-                }
-            )
-
-        # костыль для Санк-Петербурга
-        if (
-            (int(record['REGIONCODE']) == 78) and (record['OFFNAME'] == 'Санкт-Петербург') and
-            (record['LIVESTATUS'] == 1)
-        ):  
-            fs_districts.append(
-                {
-                    'guid':fed_s['guid'],
-                    'name':fed_s['name'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'tz':'',
-                    'areacode':'000'
-                }
-            )
-            locality.append(
-                {
-                    'guid':record['AOGUID'],
-                    'type':record['SHORTNAME'],
-                    'name':record['OFFNAME'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'district':record['AREACODE']
-                }
-            )
-        # костыль для Севастополя
-        if (
-            (int(record['REGIONCODE']) == 92) and (record['OFFNAME'] == 'Севастополь') and
-            (record['LIVESTATUS'] == 1)
-        ):  
-            fs_districts.append(
-                {
-                    'guid':fed_s['guid'],
-                    'name':fed_s['name'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'tz':'',
-                    'areacode':'000'
-                }
-            )
-            locality.append(
-                {
-                    'guid':record['AOGUID'],
-                    'type':record['SHORTNAME'],
-                    'name':record['OFFNAME'],
-                    'fedsubj_code':record['REGIONCODE'],
-                    'district':record['AREACODE']
-                }
-            )
+        if (int(record['REGIONCODE'])  in exceptions_cities.keys()):
+            if ((record['OFFNAME'] == exceptions_cities[int(record['REGIONCODE'])]) and (record['LIVESTATUS'] == 1)):
+                fs_districts.append(
+                    {
+                        'guid':fed_s['guid'],
+                        'name':fed_s['name'],
+                        'fedsubj_code':record['REGIONCODE'],
+                        'tz':'',
+                        'areacode':'000'
+                    }
+                )
+                locality.append(
+                    {
+                        'guid':record['AOGUID'],
+                        'type':record['SHORTNAME'],
+                        'name':record['OFFNAME'],
+                        'fedsubj_code':record['REGIONCODE'],
+                        'district':record['AREACODE']
+                    }
+                )
 
         #город или населенный пункт
         if (
@@ -250,30 +132,17 @@ def process_dbf_in_mem(dbf_file_path):
                     'district':record['AREACODE']
                 }
             )
-
-            # костыль для Тюмени
-            if ((int(record['REGIONCODE'])) == 72 and (record['OFFNAME'] == 'Тюмень')):
-                fs_districts.append(
-                    {
-                        'guid':record['AOGUID'],
-                        'name':record['OFFNAME'],
-                        'fedsubj_code':record['REGIONCODE'],
-                        'tz':'',
-                        'areacode':record['AREACODE']
-                    }
-                )
-
-            # костыль для Тюмени
-            if ((int(record['REGIONCODE'])) == 99 and (record['OFFNAME'] == 'Тюмень')):
-                fs_districts.append(
-                    {
-                        'guid':record['AOGUID'],
-                        'name':record['OFFNAME'],
-                        'fedsubj_code':record['REGIONCODE'],
-                        'tz':'',
-                        'areacode':record['AREACODE']
-                    }
-                )
+            if (int(record['REGIONCODE'])  in exceptions_districts.keys()):
+                if (record['OFFNAME'] == exceptions_districts[int(record['REGIONCODE'])]):
+                    fs_districts.append(
+                        {
+                            'guid':record['AOGUID'],
+                            'name':record['OFFNAME'],
+                            'fedsubj_code':record['REGIONCODE'],
+                            'tz':'',
+                            'areacode':record['AREACODE']
+                        }
+                    )
 
     #а теперь записываем в базу
     # тип субъекта и субъект федерации
@@ -290,8 +159,8 @@ def process_dbf_in_mem(dbf_file_path):
 
     #районы
     d_guids = []
-    # костыль для Московской области
-    if (int(record['REGIONCODE']) == 50):  
+
+    if (int(record['REGIONCODE'])  in exceptions_fed_s):
         fs_districts.append(
             {
                 'guid':fed_s['guid'],
@@ -301,17 +170,7 @@ def process_dbf_in_mem(dbf_file_path):
                 'areacode':'000'
             }
         )
-    # костыль для Ленинградской области
-    if (int(record['REGIONCODE']) == 47):  
-        fs_districts.append(
-            {
-                'guid':fed_s['guid'],
-                'name':fed_s['name'],
-                'fedsubj_code':record['REGIONCODE'],
-                'tz':'',
-                'areacode':'000'
-            }
-        )
+
     for d in fs_districts:
         d_guids.append(d['guid'])
     d_guids_from_base = list(District.select(District.guid).where(District.guid << d_guids))
