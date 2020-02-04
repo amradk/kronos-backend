@@ -19,7 +19,7 @@ class FedSubj(BaseModel):
 
 class LocalityType(BaseModel):
     type = CharField(max_length=255, unique=True)
-    #fullname = CharField(max_length=255, unique=True)
+    fullname = CharField(max_length=255, unique=True)
 
 class TimeZone(BaseModel):
     utc_tz = CharField(max_length=20)

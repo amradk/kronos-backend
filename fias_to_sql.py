@@ -6,6 +6,7 @@ from peewee import *
 from dbfread import DBF
 from model import *
 from ru_tz import *
+from oktmo import *
 
 #путь к файлам базы fias dbf, нужны ADDROBJ
 fias_dir = './'
@@ -186,10 +187,14 @@ def process_dbf_in_mem(dbf_file_path):
 
     #типы нас. пункты
     for t in lt:
+        if t['type'] in locality_full_type.keys():
+            t['fullname'] = locality_full_type[t['type']]
+        else:
+            t['fullname'] = t['type']
         try:
             LocalityType.get(LocalityType.type == t['type'])
         except:
-            LocalityType.create(type=t['type'])
+            LocalityType.create(type=t['type'], fullname=t['fullname'])
 
     #нас. пункты
     #сие есть говнокод ибо надо сделать bulk insert только того чего нет
