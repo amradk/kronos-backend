@@ -42,7 +42,6 @@ function check_prerequisites() {
     if [ "x${INSTALL_STR}" != "x"]
     then
         sudo apt install --no-install-recommends -y ${INSTALL_STR}
-        install_python_modules
     fi
 
     if [ ${CH_MYSQL_STUFF} -eq 0 ]
@@ -56,6 +55,7 @@ function check_prerequisites() {
         install_mysql_server
     fi
     #continue to check MySQL
+    install_python_modules
     check_mysql_conection ${DB_USER} ${DB_PASS} ${DB_SRV}
     check_kronos_db ${DB_USER} ${DB_PASS} ${DB_SRV}
     restore_kronos_db ${DB_USER} ${DB_PASS} ${DB_SRV}
