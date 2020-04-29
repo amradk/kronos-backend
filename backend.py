@@ -29,6 +29,35 @@ class LocalityResource(Resource):
 
         return localitys
 
+class LocalityInFedSubjResource(Resource):
+    def get(self, code, name):
+        if (name == '' or code == ''):
+            return "Locality not found", 404
+        if code.isnumeric():
+            code = abs(int(code))
+        else:
+            return "Locality not found", 404
+        query = Locality.select(Locality.id, Locality.type, Locality.guid, Locality.name, 
+                Locality.fedsubj_code, Locality.district).where((Locality.name == name) & (Locality.fedsubj_code == code))
+        if len(query) > 0:
+            localitys = []
+            for l in query:
+                localitys.append({
+                    'Name':l.name,
+                    'Type':l.type.type,
+                    'GUID':l.guid,
+                    'FedSubjCode':l.fedsubj_code.code,
+                    'FedSubjType':l.fedsubj_code.type.type,
+                    'FedSubjName':l.fedsubj_code.name,
+                    'District':l.district.name,
+                    'MSK_TZ':l.district.msk_tz,
+                    'UTC_TZ':l.district.utc_tz,
+                })
+        else:
+            return "Locality not found", 404
+
+        return localitys
+
 class FedSubjResource(Resource):
     def get(self, name):
         if name == '':
@@ -56,6 +85,7 @@ class FedSubjResource(Resource):
         return fedsubjs
 
 api.add_resource(LocalityResource, '/locality/<string:name>')
+api.add_resource(LocalityInFedSubjResource, '/locality/<int:code>/<string:name>')
 api.add_resource(FedSubjResource, '/fedsubj/<string:name>')
 
 if __name__ == '__main__':
