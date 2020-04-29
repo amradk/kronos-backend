@@ -33,7 +33,7 @@ class LocalityInFedSubjResource(Resource):
     def get(self, code, name):
         if (name == '' or code == ''):
             return "Locality not found", 404
-        if code.isnumeric():
+        if code != 0:
             code = abs(int(code))
         else:
             return "Locality not found", 404
